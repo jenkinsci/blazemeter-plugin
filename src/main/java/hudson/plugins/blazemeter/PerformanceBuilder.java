@@ -17,9 +17,10 @@ package hudson.plugins.blazemeter;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import hudson.*;
 import java.io.File;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.FilePath;
+import hudson.model.TaskListener;
+import hudson.model.Run;
 import hudson.plugins.blazemeter.utils.BuildResult;
 import hudson.plugins.blazemeter.utils.Constants;
 import hudson.plugins.blazemeter.utils.JobUtility;
@@ -31,10 +32,14 @@ import hudson.tasks.Builder;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import javax.annotation.Nonnull;
+import jenkins.tasks.SimpleBuildStep;
+import org.jenkinsci.Symbol;
+
 import java.io.IOException;
 
 
-public class PerformanceBuilder extends Builder {
+public class PerformanceBuilder extends Builder implements SimpleBuildStep {
 
     private String jobApiKey = "";
 
@@ -84,8 +89,8 @@ public class PerformanceBuilder extends Builder {
 
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher,
+                            @Nonnull TaskListener listener) throws InterruptedException, IOException {
         Result r = null;
         BuildReporter br=new BuildReporter();
         try {
@@ -93,7 +98,8 @@ public class PerformanceBuilder extends Builder {
             if (!valid) {
                 listener.error("Can not start build: userKey=" + this.jobApiKey.substring(0,3) + "... is absent in credentials store.");
                 r=Result.NOT_BUILT;
-                return true;
+                run.setResult(Result.NOT_BUILT);
+                return;
             }
             BlazeMeterBuild b = new BlazeMeterBuild();
             b.setJobApiKey(this.jobApiKey);
@@ -106,16 +112,16 @@ public class PerformanceBuilder extends Builder {
             b.setGetJtl(this.getJtl);
             b.setGetJunit(this.getJunit);
             b.setListener(listener);
-            FilePath ws = build.getWorkspace();
+            FilePath ws = workspace;
             b.setWs(ws);
-            String buildId=build.getId();
+            String buildId=run.getId();
             b.setBuildId(buildId);
-            String jobName = build.getLogFile().getParentFile().getParentFile().getParentFile().getName();
+            String jobName = run.getLogFile().getParentFile().getParentFile().getParentFile().getName();
             b.setJobName(jobName);
             VirtualChannel c = launcher.getChannel();
-            EnvVars ev=build.getEnvironment(listener);
+            EnvVars ev=run.getEnvironment(listener);
             b.setEv(ev);
-            ReportUrlTask rugt=new ReportUrlTask(build,jobName,c);
+            ReportUrlTask rugt=new ReportUrlTask(run,jobName,c);
             FilePath lp=new FilePath(ws,buildId+File.separator+Constants.BZM_LOG);
             br=new BuildReporter();
             br.run(rugt);
@@ -127,16 +133,26 @@ public class PerformanceBuilder extends Builder {
         } finally {
             br.stop();
             BuildResult rstr = BuildResult.valueOf(r.toString());
-            build.setResult(r);
+            run.setResult(r);
             switch (rstr) {
                 case FAILURE:
-                    return false;
+                    run.setResult(Result.FAILURE);
+                    return;
                 default:
-                    return true;
+                    return;
             }
         }
     }
 
+
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
     public String getJobApiKey() {
         return jobApiKey;

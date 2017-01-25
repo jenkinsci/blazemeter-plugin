@@ -14,7 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.model.ModelObject;
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ public class PerformanceReportMap implements ModelObject {
     }
 
 
-    public AbstractBuild<?, ?> getBuild() {
+    public Run<?, ?> getBuild() {
         return buildAction.getBuild();
     }
 
