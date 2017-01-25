@@ -14,7 +14,7 @@
 package hudson.plugins.blazemeter.utils.report;
 
 import hudson.EnvVars;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.plugins.blazemeter.PerformanceBuildAction;
 import hudson.remoting.VirtualChannel;
 import java.io.IOException;
@@ -23,12 +23,12 @@ import java.io.IOException;
 
 public class ReportUrlTask implements Runnable {
     private VirtualChannel c = null;
-    private AbstractBuild build = null;
+    private Run build = null;
     public boolean reportUrl = false;
     public String jobName = null;
 
 
-    public ReportUrlTask(AbstractBuild build, String jobName, VirtualChannel c) {
+    public ReportUrlTask(Run build, String jobName, VirtualChannel c) {
         this.build = build;
         this.jobName=jobName;
         this.c = c;

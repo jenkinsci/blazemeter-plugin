@@ -14,7 +14,7 @@
 
 package hudson.plugins.blazemeter;
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.model.Action;
 import hudson.util.StreamTaskListener;
 
@@ -29,14 +29,14 @@ import java.lang.ref.WeakReference;
 
 
 public class PerformanceBuildAction implements Action, StaplerProxy {
-    private final AbstractBuild<?, ?> build;
+    private final Run<?, ?> build;
 
     private transient WeakReference<PerformanceReportMap> performanceReportMap;
 
     private static final Logger logger = Logger.getLogger(PerformanceBuildAction.class.getName());
     private String reportUrl;
 
-    public PerformanceBuildAction(AbstractBuild<?, ?> pBuild) {
+    public PerformanceBuildAction(Run<?, ?> pBuild) {
         build = pBuild;
     }
 
@@ -58,7 +58,7 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
         return getPerformanceReportMap();
     }
 
-    public AbstractBuild<?, ?> getBuild() {
+    public Run<?, ?> getBuild() {
         return build;
     }
 
