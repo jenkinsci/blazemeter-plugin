@@ -4,10 +4,12 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.580.1</version>
+        <version>4.51</version>
+        <relativePath />
     </parent>
 
     <properties>
+        <jenkins.version>2.346.3</jenkins.version>
         <jenkins.build.number>local</jenkins.build.number>
     </properties>
 
@@ -49,6 +51,18 @@
         </license>
     </licenses>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.346.x</artifactId>
+                <version>1763.v092b_8980a_f5e</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -58,7 +72,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>2.3.19</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -75,7 +88,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
-            <version>2.9</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
