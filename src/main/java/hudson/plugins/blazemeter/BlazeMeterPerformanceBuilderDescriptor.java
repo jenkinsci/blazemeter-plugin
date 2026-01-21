@@ -72,23 +72,16 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     private String blazeMeterURL = Constants.A_BLAZEMETER_COM;
     private boolean isUnstableIfHasFails = false;
     private String name = "My BlazeMeter Account";
-    private static BlazeMeterPerformanceBuilderDescriptor descriptor;
-
-    public static void setDescriptor(BlazeMeterPerformanceBuilderDescriptor descriptor) {
-        BlazeMeterPerformanceBuilderDescriptor.descriptor = descriptor;
-    }
 
     public BlazeMeterPerformanceBuilderDescriptor() {
         super(PerformanceBuilder.class);
         this.load();
-        setDescriptor(this);
     }
 
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL) {
         super(PerformanceBuilder.class);
         this.load();
         this.blazeMeterURL = blazeMeterURL;
-        setDescriptor(this);
     }
 
     public BlazeMeterPerformanceBuilderDescriptor(String blazeMeterURL, boolean isUnstableIfHasFails) {
@@ -96,11 +89,10 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         this.load();
         this.blazeMeterURL = blazeMeterURL;
         this.isUnstableIfHasFails = isUnstableIfHasFails;
-        setDescriptor(this);
     }
 
     public static BlazeMeterPerformanceBuilderDescriptor getDescriptor() {
-        return BlazeMeterPerformanceBuilderDescriptor.descriptor;
+        return Jenkins.get().getDescriptorByType(BlazeMeterPerformanceBuilderDescriptor.class);
     }
 
     @Override
@@ -389,8 +381,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
         UserNotifier serverUserNotifier = new BzmServerNotifier();
         Logger logger = new BzmServerLogger();
         ProxyConfigurator.updateProxySettings(ProxyConfiguration.load(), false);
-        return new JenkinsBlazeMeterUtils(username, password,
-                BlazeMeterPerformanceBuilderDescriptor.descriptor.blazeMeterURL, serverUserNotifier, logger);
+        return new JenkinsBlazeMeterUtils(username, password, getDescriptor().blazeMeterURL, serverUserNotifier, logger);
     }
 
     public String getName() {
