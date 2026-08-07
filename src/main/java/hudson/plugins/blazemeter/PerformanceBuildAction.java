@@ -14,9 +14,9 @@
 
 package hudson.plugins.blazemeter;
 
+import hudson.Util;
 import hudson.model.Action;
 import hudson.model.Run;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerProxy;
 
 
@@ -34,7 +34,7 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
     }
 
     public String getDisplayName() {
-        return (!StringUtils.isBlank(linkName)) ?
+        return (Util.fixEmptyAndTrim(linkName) != null) ?
                 linkName :
                 "BlazeMeter Report";
     }
@@ -44,7 +44,7 @@ public class PerformanceBuildAction implements Action, StaplerProxy {
     }
 
     public String getUrlName() {
-        return (!StringUtils.isBlank(masterId)) ?
+        return (Util.fixEmptyAndTrim(masterId) != null) ?
                 "BlazeMeter_" + masterId :
                 "BlazeMeter";
     }

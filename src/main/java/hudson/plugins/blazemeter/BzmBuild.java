@@ -21,6 +21,7 @@ import com.blazemeter.ciworkflow.CiPostProcess;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.ProxyConfiguration;
+import hudson.Util;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.plugins.blazemeter.utils.Constants;
@@ -47,7 +48,6 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import jenkins.security.MasterToSlaveCallable;
 import net.sf.json.JSONArray;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
 
 public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implements Serializable {
@@ -174,7 +174,7 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
     }
 
     private void putLinkName(String runId) {
-        String linkName = (StringUtils.isBlank(reportLinkName)) ?
+        String linkName = (Util.fixEmptyAndTrim(reportLinkName) == null) ?
                 "BlazeMeter report: " + build.getCurrentTest().getName() :
                 reportLinkName;
 
@@ -186,10 +186,10 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
     private int getReportLinkNameLength() {
         try {
             String len = this.envVars.get("bzm.reportLinkName.length");
-            if (StringUtils.isBlank(len)) {
+            if (Util.fixEmptyAndTrim(len) == null) {
                 LOGGER.fine("Property bzm.reportLinkName.length did not find in Jenkins envVars");
                 len = System.getProperty("bzm.reportLinkName.length");
-                if (StringUtils.isBlank(len)) {
+                if (Util.fixEmptyAndTrim(len) == null) {
                     LOGGER.fine("Property bzm.reportLinkName.length did not find in System.properties");
                     len = "35";
                 }
@@ -266,7 +266,7 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
 
     private List<File> getAdditionalTestFiles(FilePath workspace) {
         final String additionalFiles = envVars.expand(additionalTestFiles);
-        if (StringUtils.isBlank(additionalFiles)) {
+        if (Util.fixEmptyAndTrim(additionalFiles) == null) {
             return null;
         }
 
@@ -274,7 +274,7 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
         List<File> result = new ArrayList<>();
 
         for (String path : paths) {
-            if (StringUtils.isNotBlank(path)) {
+            if (Util.fixEmptyAndTrim(path) != null) {
                 FilePath child = workspace.child(path);
                 String remote = child.getRemote();
                 File file = new File(remote);
@@ -299,7 +299,7 @@ public class BzmBuild extends MasterToSlaveCallable<Result, Exception> implement
 
     private File getMainTestFile(FilePath workspace) {
         final String path = envVars.expand(mainTestFile);
-        if (StringUtils.isBlank(path)) {
+        if (Util.fixEmptyAndTrim(path) == null) {
             return null;
         }
 

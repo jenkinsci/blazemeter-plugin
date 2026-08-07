@@ -49,12 +49,12 @@ import java.util.logging.Level;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.interceptor.RequirePOST;
+import hudson.Util;
 
 @Symbol({"blazeMeterTest"})
 @Extension
@@ -125,7 +125,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public FormValidation doCheckMainTestFile(@QueryParameter String value) {
-        if (StringUtils.isEmpty(value) || value.endsWith(".jmx") || value.endsWith(".yml") || value.endsWith(".yaml")) {
+        if (Util.fixEmpty(value) == null || value.endsWith(".jmx") || value.endsWith(".yml") || value.endsWith(".yaml")) {
             return FormValidation.ok();
         } else {
             return FormValidation.warning("Unknown script type. Please, select 'Test type' in BlazeMeter web application");
@@ -147,14 +147,14 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
         try {
             List<BlazemeterCredentialsBAImpl> creds = getCredentials();
-            BlazemeterCredentialsBAImpl credentials = (StringUtils.isBlank(credentialsId) && !creds.isEmpty()) ?
+            BlazemeterCredentialsBAImpl credentials = (Util.fixEmptyAndTrim(credentialsId) == null && !creds.isEmpty()) ?
                     creds.get(0) :
                     findCredentials(creds, credentialsId);
             if (credentials != null) {
                 BlazeMeterUtils utils = getBzmUtils(credentials.getUsername(), credentials.getPassword().getPlainText());
 
                 Workspace workspace;
-                if (StringUtils.isBlank(workspaceId)) {
+                if (Util.fixEmptyAndTrim(workspaceId) == null) {
                     List<Workspace> workspaces = getWorkspaces(utils);
                     if (workspaces.isEmpty()) {
                         items.add(new ListBoxModel.Option(NO_WORKSPACE, testId, true));
@@ -213,7 +213,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             sortedTests.add(new ListBoxModel.Option(testName, t.getId() + "." + t.getTestType(), false));
         }
 
-        if (StringUtils.isBlank(testId)) {
+        if (Util.fixEmptyAndTrim(testId) == null) {
             sortedTests.get(0).selected = true;
         }
 
@@ -259,7 +259,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
 
         try {
             List<BlazemeterCredentialsBAImpl> creds = getCredentials();
-            BlazemeterCredentialsBAImpl credentials = (StringUtils.isBlank(credentialsId) && !creds.isEmpty()) ?
+            BlazemeterCredentialsBAImpl credentials = (Util.fixEmptyAndTrim(credentialsId) == null && !creds.isEmpty()) ?
                     creds.get(0) :
                     findCredentials(creds, credentialsId);
 
@@ -290,7 +290,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
             return workspacesList;
         }
 
-        if (StringUtils.isBlank(savedWorkspace)) {
+        if (Util.fixEmptyAndTrim(savedWorkspace) == null) {
             workspacesList.get(0).selected = true;
             return workspacesList;
         }
@@ -329,7 +329,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
                 items.add(new ListBoxModel.Option(c.getDescription(), c.getId(), false));
             }
 
-            if (StringUtils.isBlank(credentialsId)) {
+            if (Util.fixEmptyAndTrim(credentialsId) == null) {
                 items.get(0).selected = true;
                 return items;
             }
@@ -371,7 +371,7 @@ public class BlazeMeterPerformanceBuilderDescriptor extends BuildStepDescriptor<
     }
 
     public BlazemeterCredentialsBAImpl findCredentials(List<BlazemeterCredentialsBAImpl> credentials, String credentialsId) {
-        if (StringUtils.isBlank(credentialsId)) {
+        if (Util.fixEmptyAndTrim(credentialsId) == null) {
             return null;
         }
 
